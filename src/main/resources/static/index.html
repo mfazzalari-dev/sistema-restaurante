@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu do Restaurante</title>
+
+    <!-- 📊 Importa a biblioteca do Gráfico (Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
+        h1, h2 { color: #d9534f; }
+        .dashboard { display: flex; gap: 20px; margin-bottom: 20px; background: #222; color: white; padding: 15px; border-radius: 8px; }
+        .dash-card { flex: 1; text-align: center; font-size: 18px; }
+        .dash-card span { display: block; font-size: 24px; font-weight: bold; color: #5cb85c; }
+        .container { display: flex; gap: 40px; }
+        .cardapio, .pedidos { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; }
+        .item-prato { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .item-prato:last-child { border: none; }
+        button { background-color: #5cb85c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #4cae4c; }
+        .carrinho { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px dashed #ccc; }
+        .campo-dados { margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .campo-dados input, .campo-dados select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .status-pronto { color: #5cb85c; font-weight: bold; }
+        .status-pedente { color: #f0ad4e; font-weight: bold; }
+        .tempo-espera { font-size: 12px; font-weight: bold; margin-right: 5px; }
+
+        /* 🖨️ ESTILO ESPECIAL PARA IMPRESSÃO DO CUPOM */
+        #cupom-impressao { display: none; }
+        @media print {
+            body * { display: none !important; }
+            #cupom-impressao, #cupom-impressao * { display: block !important; }
+            #cupom-impressao { position: absolute; left: 0; top: 0; width: 100%; font-family: monospace; font-size: 14px; }
+        }
+        .btn-imprimir { background-color: #0275d8; margin-top: 5px; margin-left: 5px; }
+        .btn-imprimir:hover { background-color: #025aa5; }
+    </style>
+</head>
+<body>
+
+<h1>🍕 Sistema do Restaurante</h1>
+<hr>
+
+<!-- DASHBOARD -->
+<div class="dashboard" style="align-items: center;">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
+        <div class="dash-card">Pedidos Realizados <span id="dash-qtd-pedidos">0</span></div>
+        <div class="dash-card">Faturamento Total <span id="dash-faturamento">R$ 0.00</span></div>
+    </div>
+    <div style="flex: 1; max-width: 450px; height: 150px; background: #333; padding: 10px; border-radius: 8px;">
+        <canvas id="graficoVendas"></canvas>
+    </div>
+</div>
+
+<div class="container">
+    <div class="cardapio">
+        <h2>📋 Cardápio</h2>
+        <div id="lista-cardapio">Carregando pratos...</div>
+        <div class="carrinho">
+            <h3>🛒 Seu Pedido</h3>
+            <div class="campo-dados"><label>Seu Nome:</label><input type="text" id="cliente-nome" placeholder="Digite seu nome"></div>
+            <div class="campo-dados"><label>Como quer receber?</label><select id="tipo-entrega" onchange="alternarCampoEndereco()"><option value="RETIRADA">Retirar no Balcão</option><option value="DELIVERY">Delivery</option></select></div>
+            <div class="campo-dados" id="bloco-endereco" style="display: none;"><label>Endereço de Entrega:</label><input type="text" id="cliente-endereco" placeholder="Rua, Número, Bairro"></div>
+            <hr><ul id="itens-carrinho"><i>Nenhum item selecionado</i></ul>
+            <button onclick="enviarPedido()">Confirmar e Enviar Pedido</button>
+        </div>
+    </div>
+
+    <div class="pedidos">
+        <h2>👨‍🍳 Cozinha (Pedidos)</h2>
+        <div style="margin-bottom: 15px; display: flex; gap: 8px;">
+            <button id="btn-filtro-todos" style="background-color: #333;" onclick="mudarFiltro('TODOS')">Todos</button>
+            <button id="btn-filtro-pendente" style="background-color: #f0ad4e;" onclick="mudarFiltro('PENDENTE')">Pendentes</button>
+            <button id="btn-filtro-pronto" style="background-color: #5cb85c;" onclick="mudarFiltro('PRONTO')">Prontos</button>
+        </div>
+        <div id="lista-pedidos">Nenhum pedido feito ainda.</div>
+    </div>
+</div>
+
+<div id="cupom-impressao"></div>
+
+<script>
+    let carrinho = [];
+    let meuGrafico = null;
+    let filtroAtual = 'TODOS';
+
+    function alternarCampoEndereco() {
+        const tipo = document.getElementById('tipo-entrega').value;
+        document.getElementById('bloco-endereco').style.display = tipo === 'DELIVERY' ? 'block' : 'none';
+    }
+
+    function mudarFiltro(novoFiltro) {
+        filtroAtual = novoFiltro;
+        atualizarTudo();
+    }
+
+    async function carregarCardapio() {
+        const res = await fetch('/api/cardapio');
+        const pratos = await res.json();
+        const div = document.getElementById('lista-cardapio');
+        div.innerHTML = '';
+        pratos.forEach(prato => {
+            div.innerHTML += `
+                    <div class="item-prato">
+                        <div><strong>${prato.nome}</strong> - R$ ${prato.preco.toFixed(2)}</div>
+                        <button onclick="adicionarAoCarrinho(${prato.id}, '${prato.nome}')">+</button>
+                    </div>`;
+        });
+    }
+
+    function adicionarAoCarrinho(id, nome) {
+        const itemExistente = carrinho.find(item => item.prato.id === id);
+        if (itemExistente) itemExistente.quantidade++;
+        else carrinho.push({ prato: { id: id }, nome: nome, quantidade: 1 });
+        atualizarCarrinhoVisual();
+    }
+
+    function atualizarCarrinhoVisual() {
+        const ul = document.getElementById('itens-carrinho');
+        ul.innerHTML = carrinho.length === 0 ? '<i>Nenhum item selecionado</i>' : '';
+        carrinho.forEach(item => {
+            ul.innerHTML += `<li>${item.nome} x ${item.quantidade} <button onclick="removerDoCarrinho(${item.prato.id})">-</button></li>`;
+        });
+    }
+
+    function removerDoCarrinho(id) {
+        carrinho = carrinho.filter(item => item.prato.id !== id);
+        atualizarCarrinhoVisual();
+    }
+
+    async function enviarPedido() {
+        const nome = document.getElementById('cliente-nome').value.trim();
+        const tipo = document.getElementById('tipo-entrega').value;
+        const endereco = document.getElementById('cliente-endereco').value.trim();
+        if (!nome || (tipo === 'DELIVERY' && !endereco)) return alert("Preencha todos os dados!");
+
+        await fetch('/api/pedidos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nomeCliente: nome, tipoEntrega: tipo, endereco: endereco, itens: carrinho.map(i => ({ prato: { id: i.prato.id }, quantidade: i.quantidade })) })
+        });
+        carrinho = [];
+        atualizarCarrinhoVisual();
+        atualizarTudo();
+    }
+
+    async function atualizarTudo() {
+        const res = await fetch('/api/pedidos');
+        const pedidos = await res.json();
+        const div = document.getElementById('lista-pedidos');
+        div.innerHTML = '';
+
+        const faturamentoPorPrato = {};
+
+        document.getElementById('btn-filtro-todos').style.opacity = filtroAtual === 'TODOS' ? '1' : '0.4';
+        document.getElementById('btn-filtro-pendente').style.opacity = filtroAtual === 'PENDENTE' ? '1' : '0.4';
+        document.getElementById('btn-filtro-pronto').style.opacity = filtroAtual === 'PRONTO' ? '1' : '0.4';
+
+        pedidos.forEach(p => {
+            p.itens.forEach(item => {
+                faturamentoPorPrato[item.prato.nome] = (faturamentoPorPrato[item.prato.nome] || 0) + (item.prato.preco * item.quantidade);
+            });
+
+            if (filtroAtual !== 'TODOS' && p.status !== filtroAtual) return;
+
+            // Lógica do Reloginho Real
+            let dataPedido = new Date(p.dataCriacao);
+            let diffMins = Math.floor((new Date() - dataPedido) / 60000);
+            let corTempo = diffMins > 30 ? '#d9534f' : '#f0ad4e';
+            let textoTempo = p.status === 'PENDENTE' ? `<span class="tempo-espera" style="color: ${corTempo}">⏳ ${diffMins} min</span>` : '';
+
+            div.innerHTML += `
+                    <div style="border-bottom: 1px solid #ddd; padding: 12px 0;">
+                        <strong>Pedido #${p.id} - ${p.nomeCliente}</strong> ${textoTempo} <span class="${p.status === 'PRONTO' ? 'status-pronto' : 'status-pedente'}">[${p.status}]</span><br>
+                        <small>📦 ${p.tipoEntrega} | 📍 ${p.endereco}</small><br>
+                        <strong>Total: R$ ${p.valorTotal.toFixed(2)}</strong><br>
+                        ${p.status === 'PENDENTE' ? `<button style="background-color: #f0ad4e;" onclick="pronto(${p.id})">Marcar Pronto</button>` : ''}
+                        <button class="btn-imprimir" onclick="imprimirCupom('${encodeURIComponent(JSON.stringify(p))}')">🖨️ Imprimir</button>
+                    </div>`;
+        });
+
+        const resResumo = await fetch('/api/pedidos/resumo');
+        const resumo = await resResumo.json();
+        document.getElementById('dash-qtd-pedidos').innerText = resumo.totalPedidos;
+        document.getElementById('dash-faturamento').innerText = `R$ ${resumo.faturamentoTotal.toFixed(2)}`;
+
+        const ctx = document.getElementById('graficoVendas').getContext('2d');
+        if (meuGrafico) {
+            meuGrafico.data.labels = Object.keys(faturamentoPorPrato);
+            meuGrafico.data.datasets[0].data = Object.values(faturamentoPorPrato);
+            meuGrafico.update();
+        } else {
+            meuGrafico = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(faturamentoPorPrato), datasets: [{ data: Object.values(faturamentoPorPrato), backgroundColor: '#5cb85c' }] }, options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } } });
+        }
+    }
+
+    async function pronto(id) { await fetch(`/api/pedidos/${id}/status?novoStatus=PRONTO`, { method: 'PUT' }); atualizarTudo(); }
+    function imprimirCupom(json) {
+        const p = JSON.parse(decodeURIComponent(json));
+        document.getElementById('cupom-impressao').innerHTML = `<pre>PEDIDO #${p.id}\nCliente: ${p.nomeCliente}\nData: ${new Date().toLocaleString()}\n-------------------\nTotal: R$ ${p.valorTotal.toFixed(2)}</pre>`;
+        window.print();
+    }
+
+    carregarCardapio();
+    atualizarTudo();
+    setInterval(atualizarTudo, 5000);
+</script>
+</body>
+</html>

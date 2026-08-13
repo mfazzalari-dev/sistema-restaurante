@@ -1,0 +1,21 @@
+### Cadastrar um Pedido (Simulando o Cliente comprando)
+POST http://localhost:8080/api/pedidos
+Content-Type: application/json
+
+{
+  "itens": [
+    {
+      "prato": {
+        "id": 1
+      },
+      "quantidade": 2
+    },
+    {
+      "prato": {
+        "id": 2
+      },
+      "quantidade": 1
+    }
+  ]
+} ### Atualizar o Status do Pedido para PRONTO
+PUT http://localhost:8080/api/pedidos/1/status?novoStatus=PRONTO
