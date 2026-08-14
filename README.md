@@ -1,34 +1,58 @@
-# 🍽️ Sistema de Gerenciamento de Restaurante
+🍽️ Sistema de Gerenciamento de Restaurante
+Sistema web robusto para gerenciamento de pedidos e operações de um restaurante. Desenvolvido para aprimorar conhecimentos em arquitetura Back-end, APIs RESTful e esteiras de CI/CD.
 
-Sistema web desenvolvido para gerenciamento de pedidos de um restaurante, criado com o objetivo de praticar desenvolvimento Back-end com Java e Spring Boot.
+🚀 Funcionalidades
+Gestão de Pedidos: Cadastro, edição e controle de status em tempo real.
 
-## 🚀 Funcionalidades
+Cardápio Digital: Gestão completa de produtos e categorias.
 
-- Cadastro e gerenciamento de pedidos
-- Cardápio de produtos
-- Controle do status dos pedidos
-- Painel de pedidos da cozinha
-- Cálculo automático do faturamento
-- API REST
+Painel da Cozinha: Visualização dinâmica dos pedidos prontos para preparo.
 
-## 🛠️ Tecnologias
+Inteligência de Negócios: Cálculo automático de faturamento e métricas de desempenho.
 
-- Java
-- Spring Boot
-- Maven
-- Git e GitHub
+API REST: Arquitetura escalável para integração com futuros front-ends.
 
-## 🖥️ Interface
+🛠️ Tecnologias e Ferramentas
+Linguagem: Java 21
 
-![Sistema de Restaurante](docs/dashboard.png)
+Framework: Spring Boot 3
 
-## 📌 Sobre o projeto
+Gerenciamento: Maven
 
-Projeto desenvolvido para colocar em prática conceitos de desenvolvimento de APIs REST, organização de código, regras de negócio e versionamento com Git.
+Containerização: Docker
 
-## ▶️ Como executar
+Versionamento: Git & GitHub
 
-```bash
-git clone https://github.com/mfazzalari/sistema-restaurante.git
+Deploy: Render (Cloud PaaS)
+
+🌐 Acesso em Produção
+O sistema está disponível online para demonstração:
+👉 Acesse aqui o sistema
+
+📌 Sobre o Projeto
+Este projeto foi concebido para aplicar conceitos avançados de desenvolvimento Back-end, incluindo:
+
+Estruturação de APIs REST seguindo boas práticas.
+
+Persistência de dados com Spring Data JPA.
+
+Deploy automatizado e conteinerização com Docker.
+
+Organização de código e arquitetura de sistemas.
+
+▶️ Como Executar Localmente
+Pré-requisitos
+Java 21 instalado.
+
+Docker instalado (opcional, para execução em container).
+
+Rodando com Maven
+Bash
+# Clone o repositório
+git clone https://github.com/mfazzalari-dev/sistema-restaurante.git
+
+# Entre na pasta
 cd sistema-restaurante
+
+# Execute a aplicação
 ./mvnw spring-boot:run
