@@ -1,8 +1,8 @@
-🍽️ Sistema de Gerenciamento de Restaurante
+# 🍽️ Sistema de Gerenciamento de Restaurante
 
 Sistema web robusto para gerenciamento de pedidos e operações de um restaurante, contando com uma interface moderna totalmente responsiva para dispositivos móveis. Desenvolvido para aprimorar conhecimentos em arquitetura Back-end, APIs RESTful e esteiras de CI/CD.
 
-🚀 Funcionalidades
+## 🚀 Funcionalidades
 
 * **Cardápio Digital:** Gestão completa de produtos e categorias.
 * **Painel da Cozinha:** Visualização dinâmica dos pedidos prontos para preparo.
@@ -10,7 +10,7 @@ Sistema web robusto para gerenciamento de pedidos e operações de um restaurant
 * **Layout Responsivo:** Interface otimizada para uso em computadores, tablets e celulares.
 * **API REST:** Arquitetura escalável para integração completa com o Front-end.
 
-🛠️ Tecnologias e Ferramentas
+## 🛠️ Tecnologias e Ferramentas
 
 * **Linguagem:** Java 21
 * **Framework:** Spring Boot 3
@@ -20,11 +20,11 @@ Sistema web robusto para gerenciamento de pedidos e operações de um restaurant
 * **Versionamento:** Git & GitHub
 * **Deploy:** Render (Cloud PaaS)
 
-🌐 Acesso em Produção
+## 🌐 Acesso em Produção
 
-O sistema está disponível online para demonstração: 👉 [Acesse aqui o sistema](https://sistema-restaurante-zhcp.onrender.com/)
+O sistema está disponível online para demonstração: 👉 [Acesse aqui o sistema](https://sistema-restaurante.onrender.com)
 
-📌 Sobre o Projeto
+## 📌 Sobre o Projeto
 
 Este projeto foi concebido para aplicar conceitos avançados de desenvolvimento Full-stack e Back-end, incluindo:
 * Estruturação de APIs REST seguindo boas práticas.
@@ -32,14 +32,14 @@ Este projeto foi concebido para aplicar conceitos avançados de desenvolvimento 
 * Deploy automatizado e conteinerização com Docker.
 * Organização de código, design responsivo e experiência de usuário (UX).
 
-▶️ Como Executar Localmente
+## ▶️ Como Executar Localmente
 
-Pré-requisitos
+### Pré-requisitos
 
 * Java 21 instalado.
 * Docker instalado (opcional, para execução em container).
 
-Rodando com Maven
+### Rodando com Maven
 
 # Clone o repositório
 git clone https://github.com/mfazzalari-dev/sistema-restaurante.git
