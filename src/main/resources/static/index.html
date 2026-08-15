@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu do Restaurante</title>
@@ -11,56 +9,192 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-            /* Layout padrão para telas maiores (computador) */
-        .container-principal {
+        /* --- Estilos Globais --- */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 10px;
+        }
+
+        h1, h2 {
+            color: #d9534f;
+        }
+
+        /* --- Dashboard Superior Responsivo --- */
+        .dashboard {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #222;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            align-items: center;
+            flex-wrap: wrap; /* Permite quebrar linha no celular */
+        }
+
+        .dash-card-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 200px;
+        }
+
+        .dash-card {
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .dash-card span {
+            display: block;
+            font-size: 22px;
+            font-weight: bold;
+            color: #5cb85c;
+        }
+
+        .dash-grafico-wrapper {
+            flex: 1;
+            width: 100%;
+            max-width: 450px;
+            min-width: 250px;
+            height: 150px;
+            background: #333;
+            padding: 10px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        /* --- Container Principal (Cardápio e Cozinha) --- */
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap; /* Empilha automaticamente em telas menores */
+        }
+
+        .cardapio, .pedidos {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 280px; /* Garante que não esmague demais */
+            box-sizing: border-box;
+        }
+
+        .item-prato {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
             display: flex;
             justify-content: space-between;
-            padding: 20px;
+            align-items: center;
         }
 
-        /* Ajustes automáticos para Celulares e Tablets */
-        @media (max-width: 768px) {
-            .container-principal {
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            .card-pedido {
-                width: 100% !important;
-                margin-bottom: 15px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
+        .item-prato:last-child {
+            border: none;
         }
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
-        h1, h2 { color: #d9534f; }
-        .dashboard { display: flex; gap: 20px; margin-bottom: 20px; background: #222; color: white; padding: 15px; border-radius: 8px; }
-        .dash-card { flex: 1; text-align: center; font-size: 18px; }
-        .dash-card span { display: block; font-size: 24px; font-weight: bold; color: #5cb85c; }
-        .container { display: flex; gap: 40px; }
-        .cardapio, .pedidos { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; }
-        .item-prato { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .item-prato:last-child { border: none; }
-        button { background-color: #5cb85c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #4cae4c; }
-        .carrinho { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px dashed #ccc; }
-        .campo-dados { margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .campo-dados input, .campo-dados select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .status-pronto { color: #5cb85c; font-weight: bold; }
-        .status-pedente { color: #f0ad4e; font-weight: bold; }
-        .tempo-espera { font-size: 12px; font-weight: bold; margin-right: 5px; }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .carrinho {
+            margin-top: 20px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px dashed #ccc;
+        }
+
+        .campo-dados {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .campo-dados input, .campo-dados select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .status-pronto {
+            color: #5cb85c;
+            font-weight: bold;
+        }
+
+        .status-pedente {
+            color: #f0ad4e;
+            font-weight: bold;
+        }
+
+        .tempo-espera {
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
 
         /* 🖨️ ESTILO ESPECIAL PARA IMPRESSÃO DO CUPOM */
-        #cupom-impressao { display: none; }
+        #cupom-impressao {
+            display: none;
+        }
+
         @media print {
             body * { display: none !important; }
             #cupom-impressao, #cupom-impressao * { display: block !important; }
             #cupom-impressao { position: absolute; left: 0; top: 0; width: 100%; font-family: monospace; font-size: 14px; }
         }
-        .btn-imprimir { background-color: #0275d8; margin-top: 5px; margin-left: 5px; }
-        .btn-imprimir:hover { background-color: #025aa5; }
+
+        .btn-imprimir {
+            background-color: #0275d8;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .btn-imprimir:hover {
+            background-color: #025aa5;
+        }
+
+        /* ============================================================ */
+        /* ================= RESPONSIVIDADE MOBILE ===================== */
+        /* ============================================================ */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .dashboard {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            /* Esconde o gráfico em telas muito pequenas para evitar bugs visuais */
+            .dash-grafico-wrapper {
+                display: none;
+            }
+
+            .container {
+                flex-direction: column; /* Empilha Cardápio e Cozinha verticalmente */
+                gap: 15px;
+            }
+
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
@@ -69,12 +203,12 @@
 <hr>
 
 <!-- DASHBOARD -->
-<div class="dashboard" style="align-items: center;">
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
+<div class="dashboard">
+    <div class="dash-card-container">
         <div class="dash-card">Pedidos Realizados <span id="dash-qtd-pedidos">0</span></div>
         <div class="dash-card">Faturamento Total <span id="dash-faturamento">R$ 0.00</span></div>
     </div>
-    <div style="flex: 1; max-width: 450px; height: 150px; background: #333; padding: 10px; border-radius: 8px;">
+    <div class="dash-grafico-wrapper">
         <canvas id="graficoVendas"></canvas>
     </div>
 </div>
@@ -88,14 +222,14 @@
             <div class="campo-dados"><label>Seu Nome:</label><input type="text" id="cliente-nome" placeholder="Digite seu nome"></div>
             <div class="campo-dados"><label>Como quer receber?</label><select id="tipo-entrega" onchange="alternarCampoEndereco()"><option value="RETIRADA">Retirar no Balcão</option><option value="DELIVERY">Delivery</option></select></div>
             <div class="campo-dados" id="bloco-endereco" style="display: none;"><label>Endereço de Entrega:</label><input type="text" id="cliente-endereco" placeholder="Rua, Número, Bairro"></div>
-            <hr><ul id="itens-carrinho"><i>Nenhum item selecionado</i></ul>
-            <button onclick="enviarPedido()">Confirmar e Enviar Pedido</button>
+            <hr><ul id="itens-carrinho" style="padding-left: 20px;"><i>Nenhum item selecionado</i></ul>
+            <button onclick="enviarPedido()" style="width: 100%;">Confirmar e Enviar Pedido</button>
         </div>
     </div>
 
     <div class="pedidos">
         <h2>👨‍🍳 Cozinha (Pedidos)</h2>
-        <div style="margin-bottom: 15px; display: flex; gap: 8px;">
+        <div style="margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-filtro-todos" style="background-color: #333;" onclick="mudarFiltro('TODOS')">Todos</button>
             <button id="btn-filtro-pendente" style="background-color: #f0ad4e;" onclick="mudarFiltro('PENDENTE')">Pendentes</button>
             <button id="btn-filtro-pronto" style="background-color: #5cb85c;" onclick="mudarFiltro('PRONTO')">Prontos</button>
@@ -146,7 +280,7 @@
         const ul = document.getElementById('itens-carrinho');
         ul.innerHTML = carrinho.length === 0 ? '<i>Nenhum item selecionado</i>' : '';
         carrinho.forEach(item => {
-            ul.innerHTML += `<li>${item.nome} x ${item.quantidade} <button onclick="removerDoCarrinho(${item.prato.id})">-</button></li>`;
+            ul.innerHTML += `<li>${item.nome} x ${item.quantidade} <button onclick="removerDoCarrinho(${item.prato.id})" style="padding: 2px 6px; font-size: 10px;">-</button></li>`;
         });
     }
 
@@ -190,7 +324,6 @@
 
             if (filtroAtual !== 'TODOS' && p.status !== filtroAtual) return;
 
-            // Lógica do Reloginho Real
             let dataPedido = new Date(p.dataCriacao);
             let diffMins = Math.floor((new Date() - dataPedido) / 60000);
             let corTempo = diffMins > 30 ? '#d9534f' : '#f0ad4e';
@@ -200,8 +333,8 @@
                     <div style="border-bottom: 1px solid #ddd; padding: 12px 0;">
                         <strong>Pedido #${p.id} - ${p.nomeCliente}</strong> ${textoTempo} <span class="${p.status === 'PRONTO' ? 'status-pronto' : 'status-pedente'}">[${p.status}]</span><br>
                         <small>📦 ${p.tipoEntrega} | 📍 ${p.endereco}</small><br>
-                        <strong>Total: R$ ${p.valorTotal.toFixed(2)}</strong><br>
-                        ${p.status === 'PENDENTE' ? `<button style="background-color: #f0ad4e;" onclick="pronto(${p.id})">Marcar Pronto</button>` : ''}
+                        <strong>Total: R$ ${p.valorTotal.toFixed(2)}</strong><br style="margin-bottom: 5px;">
+                        ${p.status === 'PENDENTE' ? `<button style="background-color: #f0ad4e; margin-top: 5px;" onclick="pronto(${p.id})">Marcar Pronto</button>` : ''}
                         <button class="btn-imprimir" onclick="imprimirCupom('${encodeURIComponent(JSON.stringify(p))}')">🖨️ Imprimir</button>
                     </div>`;
         });
@@ -217,11 +350,27 @@
             meuGrafico.data.datasets[0].data = Object.values(faturamentoPorPrato);
             meuGrafico.update();
         } else {
-            meuGrafico = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(faturamentoPorPrato), datasets: [{ data: Object.values(faturamentoPorPrato), backgroundColor: '#5cb85c' }] }, options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } } });
+            meuGrafico = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(faturamentoPorPrato),
+                    datasets: [{ data: Object.values(faturamentoPorPrato), backgroundColor: '#5cb85c' }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
     }
 
-    async function pronto(id) { await fetch(`/api/pedidos/${id}/status?novoStatus=PRONTO`, { method: 'PUT' }); atualizarTudo(); }
+    async function pronto(id) {
+        await fetch(`/api/pedidos/${id}/status?novoStatus=PRONTO`, { method: 'PUT' });
+        atualizarTudo();
+    }
+
     function imprimirCupom(json) {
         const p = JSON.parse(decodeURIComponent(json));
         document.getElementById('cupom-impressao').innerHTML = `<pre>PEDIDO #${p.id}\nCliente: ${p.nomeCliente}\nData: ${new Date().toLocaleString()}\n-------------------\nTotal: R$ ${p.valorTotal.toFixed(2)}</pre>`;
